@@ -8,48 +8,50 @@ class GildedRose
   end
 
   def tick
-    if @name != "Aged Brie" and @name != "Backstage passes to a TAFKAL80ETC concert"
-      if @quality > 0
-        if @name != "Sulfuras, Hand of Ragnaros"
-          @quality = @quality - 1
-        end
+    update_quality
+    update_days_remaining
+  end
+
+  private
+
+  def update_quality
+    case @name
+    when 'Sulfuras, Hand of Ragnaros'
+      return
+    when 'Aged Brie'
+      if @quality < 50 && @days_remaining > 0
+        @quality += 1
+      elsif @quality < 50 && @days_remaining <= 0
+        @quality == 49 ? @quality = 50 : @quality += 2 # 50 is limit
       end
-    else
-      if @quality < 50
-        @quality = @quality + 1
-        if @name == "Backstage passes to a TAFKAL80ETC concert"
-          if @days_remaining < 11
-            if @quality < 50
-              @quality = @quality + 1
-            end
-          end
-          if @days_remaining < 6
-            if @quality < 50
-              @quality = @quality + 1
-            end
-          end
-        end
+    when 'Backstage passes to a TAFKAL80ETC concert'
+      if @days_remaining <= 0
+      @quality = 0
+      elsif @quality < 50 && @days_remaining < 6
+        @quality > 47 ? @quality = 50 : @quality += 3 # 50 is limit
+      elsif @quality < 50 && @days_remaining < 11
+        @quality += 2
+      elsif @quality < 50
+        @quality += 1
+      end
+    when 'Normal Item'
+      if @quality > 0  && @days_remaining > 0
+        @quality -= 1
+      elsif @quality > 0 && @days_remaining <= 0
+        @quality -= 2
+      end
+    when 'Conjured Mana Cake'
+      if @quality > 0 && @days_remaining > 0
+        @quality -= 2
+      elsif @quality > 0 && @days_remaining <= 0
+        @quality -= 4
       end
     end
-    if @name != "Sulfuras, Hand of Ragnaros"
-      @days_remaining = @days_remaining - 1
-    end
-    if @days_remaining < 0
-      if @name != "Aged Brie"
-        if @name != "Backstage passes to a TAFKAL80ETC concert"
-          if @quality > 0
-            if @name != "Sulfuras, Hand of Ragnaros"
-              @quality = @quality - 1
-            end
-          end
-        else
-          @quality = @quality - @quality
-        end
-      else
-        if @quality < 50
-          @quality = @quality + 1
-        end
-      end
+  end
+
+  def update_days_remaining
+    if @name != 'Sulfuras, Hand of Ragnaros'
+      @days_remaining -= 1
     end
   end
 end
